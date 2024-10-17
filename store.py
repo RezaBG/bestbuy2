@@ -9,7 +9,7 @@ class Store:
         self.products.remove(product)
 
     def get_total_quantity(self) -> int:
-        return sum([product.get_quantity() for product in self.products])
+        return sum([product.quantity for product in self.products])
 
     def get_all_products(self):
         return [product for product in self.products if product.is_active()]
@@ -19,3 +19,10 @@ class Store:
         for product, quantity in shopping_list:
             total_price += product.buy(quantity)
         return total_price
+
+    def __contains__(self, product) -> bool:
+        return product in self.products
+
+    def __add__(self, other_store):
+        combined_products = self.products + other_store.products
+        return Store(combined_products)

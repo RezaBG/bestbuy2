@@ -2,20 +2,36 @@ class Product:
     def __init__(self, name: str, price: float, quantity: int):
         if not name or price < 0 or quantity < 0:
             raise ValueError("Invalid product details")
-        self.name = name
-        self.price = price
-        self.quantity = quantity
+        self._name = name
+        self._price = price
+        self._quantity = quantity
         self.active = True
         self.promotion = None
 
-    def get_quantity(self) -> int:
-        return self.quantity
+    @property
+    def name(self):
+        return self._name
 
-    def set_quantity(self, quantity: int):
-        if quantity < 0:
+    @property
+    def price(self):
+        return self._price
+
+    @price.setter
+    def price(self, new_price):
+        if new_price < 0:
+            raise ValueError("Price cannot be negative.")
+        self._price = new_price
+
+    @property
+    def quantity(self):
+        return self._quantity
+
+    @quantity.setter
+    def quantity(self, new_quantity):
+        if new_quantity < 0:
             raise ValueError("Quantity cannot be negative.")
-        self.quantity = quantity
-        if self.quantity == 0:
+        self._quantity = new_quantity
+        if self._quantity == 0:
             self.deactivate()
 
     def is_active(self) -> bool:
@@ -27,8 +43,19 @@ class Product:
     def deactivate(self):
         self.active = False
 
-    def show(self) -> str:
-        return f"{self.name}, Price: €{self.price}, Quantity: {self.quantity}"
+    def __str__(self) -> str:
+        promotion_info = f" (Promotion: {self.promotion.name})" if self.promotion else ""
+        return f"{self.name}, Price: €{self.price}, Quantity: {self.quantity}{promotion_info}"
+
+    def __gt__(self, other):
+        if isinstance(other, Product):
+            return self.price > other.price
+        return NotImplemented
+
+    def __lt__(self, other):
+        if isinstance(other, Product):
+            return self.price < other.price
+        return NotImplemented
 
     def buy(self, quantity: int) -> float:
         if not self.is_active() or quantity > self.quantity:
@@ -39,31 +66,32 @@ class Product:
 
         if self.promotion:
             return self.promotion.apply_promotion(self, quantity)
+
         return self.price * quantity
 
 
-# New Product Types
+# Define the new product types using inheritance
 
 class NonStockedProduct(Product):
-    def __init__(self, name, price):
-        super().__init__(name, price, quantity=0)  # Non-stocked products have no quantity
+    def __init__(self, name: str, price: float):
+        # NonStockedProduct always has a quantity of 0
+        super().__init__(name, price, quantity=0)
 
-    def set_quantity(self, quantity):
-        raise Exception("Non-stocked products don't have a quantity.")
+    def set_quantity(self, quantity: int):
+        # Quantity is always 0 for non-stocked products
+        raise ValueError("Cannot set quantity for non-stocked product")
 
-    def show(self):
-        return f"{self.name}, Price: €{self.price} (Non-stocked product)"
+    def buy(self, quantity: int) -> float:
+        # Buying any quantity is always allowed for non-stocked products
+        return self.price * quantity
 
 
 class LimitedProduct(Product):
-    def __init__(self, name, price, quantity, maximum):
+    def __init__(self, name: str, price: float, quantity: int, maximum: int):
         super().__init__(name, price, quantity)
         self.maximum = maximum
 
-    def buy(self, quantity):
+    def buy(self, quantity: int) -> float:
         if quantity > self.maximum:
-            raise Exception(f"Cannot buy more than {self.maximum} units of this product.")
+            raise Exception(f"Cannot buy more than {self.maximum} of this item.")
         return super().buy(quantity)
-
-    def show(self):
-        return f"{self.name}, Price: €{self.price}, Quantity: {self.quantity} (Max purchase limit: {self.maximum})"

@@ -69,6 +69,32 @@ def start(store: Store):
             print("Invalid choice, please try again.")
 
 
+def test_magic_methods():
+    # Setup initial stock
+    mac = Product("MacBook Air M2", price=1450, quantity=100)
+    bose = Product("Bose QuietComfort Earbuds", price=250, quantity=500)
+    pixel = Product("Google Pixel 7", price=500, quantity=250)
+
+    best_buy = Store([mac, bose])
+
+    # Test properties and __str__
+    mac.price = 1200
+    print(mac)  # Should print 'MacBook Air M2, Price: €1200, Quantity: 100'
+
+    # Test > and < operators
+    print(mac > bose)  # Should print True
+    print(mac < bose)  # Should print False
+
+    # Test 'in' operator
+    print(mac in best_buy)  # Should print True
+    print(pixel in best_buy)  # Should print False
+
+    # Test + operator for combining stores
+    another_store = Store([pixel])
+    combined_store = best_buy + another_store
+    print([product.name for product in combined_store.products])  # Should show Mac, Bose, and Pixel
+
+
 def main():
     store = create_default_inventory()
 
@@ -88,3 +114,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+    test_magic_methods()
