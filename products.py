@@ -6,6 +6,7 @@ class Product:
         self.price = price
         self.quantity = quantity
         self.active = True
+        self.promotion = None
 
     def get_quantity(self) -> int:
         return self.quantity
@@ -35,6 +36,9 @@ class Product:
         self.quantity -= quantity
         if self.quantity == 0:
             self.deactivate()
+
+        if self.promotion:
+            return self.promotion.apply_promotion(self, quantity)
         return self.price * quantity
 
 

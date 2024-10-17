@@ -1,5 +1,6 @@
 from products import Product, NonStockedProduct, LimitedProduct
 from store import Store
+from promotions import PercentDiscount, SecondHalfPrice, ThirdOneFree
 
 
 def create_default_inventory():
@@ -70,6 +71,18 @@ def start(store: Store):
 
 def main():
     store = create_default_inventory()
+
+    # Create promotions
+    second_half_price = SecondHalfPrice("Second Half price!")
+    third_one_free = ThirdOneFree("Third One Free!")
+    percent_discount = PercentDiscount("30% off!", percent=30)
+
+    # Add promotions to products
+    store.products[0].set_promotion(second_half_price)  # MacBook Air M2
+    store.products[1].set_promotion(third_one_free)  # Bose QuietComfort Earbuds
+    store.products[3].set_promotion(percent_discount)  # Windows License
+
+    # Start the user interface
     start(store)
 
 
